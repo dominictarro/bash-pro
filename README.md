@@ -6,7 +6,7 @@ Bash scripts and modules for everyday use.
 
 | Script | Description |
 | ------ | ----------- |
-| [prepare_conda_pkg.sh](prepare_conda_pkg.sh) | Prepare a conda package for upload to conda-forge |
+| [prepare_conda_pkg.sh](prepare_conda_pkg.sh) | Prepare a PyPI package for upload to conda-forge |
 
 ## Modules
 
