@@ -86,38 +86,24 @@ if [ ! -d "$WORK_DIR" ]; then
     exit 1
 fi
 
-GIT_VALIDATED=false
-function validate_git() {
-    if [[ $GIT_VALIDATED == "true" ]]; then
-        return
-    fi
-    # Validate git installed/in path
-    if ! command -v git &> /dev/null; then
-        log_error "git is not installed or in PATH (remarkably. you live under a rock?). Please install it and try again."
-        exit 1
-    fi
+# Validate git installed/in path
+if ! command -v git &> /dev/null; then
+    log_error "git is not installed or in PATH (remarkably. you live under a rock?). Please install it and try again."
+    exit 1
+fi
 
-    GIT_VALIDATED=true
-}
+# Validate gh installed/in path
+if ! command -v gh &> /dev/null; then
+    log_error "gh CLI is not installed or in PATH. Please install it and try again."
+    exit 1
+fi
 
-GH_VALIDATED=false
-function validate_gh() {
-    if [[ $GH_VALIDATED == "true" ]]; then
-        return
-    fi
-    # Validate gh installed
-    if ! command -v gh &> /dev/null; then
-        log_error "gh CLI is not installed. Please install it and try again."
-        exit 1
-    fi
-
-    # Validate gh authenticated
-    if ! gh auth status &> /dev/null; then
-        log_error "You are not authenticated with GitHub. Please authenticate and try again."
-        exit 1
-    fi
-    GH_VALIDATED=true
-}
+# Validate gh authenticated
+if ! gh auth status &> /dev/null; then
+    log_error "You are not authenticated with GitHub. Please authenticate and try again."
+    exit 1
+fi
+GH_VALIDATED=true
 
 # Validate grayskull installed
 if ! command -v grayskull &> /dev/null; then
@@ -131,11 +117,9 @@ fi
 GITHUB_USER=`get_param_value "-u" "--github-user" "$@"`
 if [ -z "$GITHUB_USER" ]; then
     log_verbose "Attempting to retrieve GitHub user from git configuration."
-    validate_git
     GITHUB_USER=`git config --get remote.origin.url | sed 's/.*github.com\///' | sed 's/\/.*\.git//'`
     if [ -z "$GITHUB_USER" ]; then
         log_verbose "Attempting to retrieve GitHub user from gh CLI."
-        validate_gh
         GITHUB_USER=`gh api user | jq -r .login | sed 's/null//'`
         if [ -z "$GITHUB_USER" ]; then
             log_error "Unable to retrieve GitHub user."
@@ -155,11 +139,9 @@ fi
 GITHUB_EMAIL=`get_param_value "-e" "--github-email" "$@"`
 if [ -z "$GITHUB_EMAIL" ]; then
     log_verbose "Attempting to retrieve GitHub email from git configuration."
-    validate_git
     GITHUB_EMAIL=`git config --get user.email`
     if [ -z "$GITHUB_EMAIL" ]; then
         log_verbose "Attempting to retrieve GitHub email from gh CLI."
-        validate_gh
         GITHUB_EMAIL=`gh api user | jq -r .email | sed 's/null//'`
         if [ -z "$GITHUB_EMAIL" ]; then
             log_error "Unable to retrieve GitHub email."
