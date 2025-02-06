@@ -40,7 +40,7 @@ function run_with_verbosity() {
     fi
 }
 
-WRAP_LINE_LENGTH=80
+WRAP_LINE_LENGTH=$(( $(tput cols) * 90 / 100 ))
 export WRAP_LINE_LENGTH
 
 
